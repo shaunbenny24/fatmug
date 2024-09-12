@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video List</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .video-item {
+            margin-bottom: 20px;
+        }
+        .video-item h3 {
+            margin-top: 10px;
+        }
+        .search-results a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .search-results a:hover {
+            text-decoration: underline;
+        }
+        .no-results {
+            color: #6c757d;
+        }
+        .video-wrapper {
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+        .search-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                {% if selected_video %}
+                    <div class="video-item">
+                        <h3>{{ selected_video.title }}</h3>
+                        <video id="video-player" controls width="100%" class="video-wrapper">
+                            <source src="{{ selected_video.file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        {% if selected_video.subtitles %}
+                            <pre>{{ selected_video.subtitles }}</pre>
+                        {% else %}
+                            <p class="text-muted">No subtitles available.</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-4 search-container">
+                <h3>Search Subtitles</h3>
+                <form method="GET" action="{% url 'video_list' %}">
+                    <div class="form-group">
+                        {{ form.query.label_tag }}
+                        {{ form.query }}
+                    </div>
+                    <input type="hidden" name="video_id" value="{{ selected_video.id }}">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+
+                {% if query %}
+                    <div class="search-results mt-3">
+                        <h4>Search Results for "{{ query }}"</h4>
+                        {% if search_results %}
+                            <ul class="list-unstyled">
+                                {% for timestamp, subtitle in search_results %}
+                                    <li>
+                                        <a href="#" onclick="playFromTime('{{ timestamp }}'); return false;">{{ timestamp }}</a>: {{ subtitle }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="no-results">No results found for "{{ query }}"</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if not selected_video %}
+            <div class="list-group mt-3">
+                {% for video in videos %}
+                    <div class="list-group-item video-item">
+                        <a href="?video_id={{ video.id }}" class="list-group-item-action">{{ video.title }}</a>
+                        <video controls width="100%" class="mb-3 video-wrapper">
+                            <source src="{{ video.file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        {% if video.subtitles %}
+                            <pre>{{ video.subtitles }}</pre>
+                        {% else %}
+                            <p class="text-muted">No subtitles available.</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function parseTime(timestamp) {
+            const parts = timestamp.split(':');
+            const hours = parseInt(parts[0], 10) || 0;
+            const minutes = parseInt(parts[1], 10) || 0;
+            const seconds = parseFloat(parts[2].replace(',', '.')) || 0;
+            return (hours * 3600) + (minutes * 60) + seconds;
+        }
+
+        function playFromTime(timestamp) {
+            const video = document.getElementById('video-player');
+            const time = parseTime(timestamp);
+
+            console.log(`Requested playback time: ${time} seconds`); // Log the requested playback time
+
+            if (!video) {
+                console.error('Video player not found');
+                return;
+            }
+
+            // Set the video current time and play
+            video.currentTime = time;
+            video.play();
+
+            // Log the time set
+            console.log(`Setting video currentTime to ${time}`);
+        }
+    </script>
+    
+</body>
+</html>
