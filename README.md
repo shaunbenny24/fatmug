@@ -52,7 +52,7 @@ Make sure the Docker daemon is running. You can start it with:
 
 **********************************************************************************************
 sudo systemctl start docker
-And check its status with:
+
 
 **********************************************************************************************
 sudo systemctl status docker
@@ -74,6 +74,11 @@ Ensure your user is part of the Docker group. This allows non-root users to acce
 
 **********************************************************************************************
 sudo usermod -aG docker $USER
+
+
+sudo usermod -aG docker $USER
+sudo chown root:docker /var/run/docker.sock
+sudo chmod 660 /var/run/docker.sock
 
 
 ********************************************************
