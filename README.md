@@ -1,1 +1,110 @@
 # fatmug
+Project Documentation
+Overview
+This documentation provides instructions for setting up, running, and managing the project using Docker. It includes steps for making database migrations, running Docker commands, and handling user permissions.
+
+Prerequisites
+Docker
+Docker Compose
+Ensure you have these installed and running on your system.
+
+Setting Up the Project
+Clone the Repository
+
+Clone the project repository to your local machine:
+
+
+git clone <repository_url>
+cd <repository_directory>
+Start Docker Service
+
+Make sure Docker is running:
+
+
+sudo systemctl start docker
+sudo systemctl status docker
+Add User to Docker Group
+
+To avoid permission issues, add your user to the Docker group:
+
+
+sudo usermod -aG docker $USER
+After running this command, log out and log back in, or use:
+
+
+newgrp docker
+Running the Project
+Build and Start Containers
+
+Build and start the Docker containers using Docker Compose:
+
+
+docker-compose up --build
+Accessing the Application
+
+Once the containers are running, access the application through the web browser at http://localhost:<port>, where <port> is the port defined in your docker-compose.yml file.
+
+Database Migrations
+Run Migrations
+
+To apply database migrations, first access the Django container:
+
+
+docker-compose exec web bash
+Then, inside the container, run:
+
+
+python manage.py makemigrations
+python manage.py migrate
+After running migrations, you can exit the container:
+
+
+exit
+Create Superuser
+
+To create a superuser for Django admin, run:
+
+
+docker-compose exec web python manage.py createsuperuser
+Follow the prompts to enter the superuser details.
+
+Managing Docker Containers
+List Running Containers
+
+To list running containers:
+
+
+docker ps
+Stop and Remove Containers
+
+To stop and remove all containers, networks, and volumes:
+
+
+docker-compose down
+To stop a specific container:
+
+
+docker stop <container_id_or_name>
+To remove a specific container:
+
+
+docker rm <container_id_or_name>
+View Logs
+
+To view logs from the Docker containers:
+
+
+docker-compose logs
+Troubleshooting
+Permission Error: Ensure Docker is running and your user has been added to the Docker group. Use sudo if needed, or log out and log back in.
+
+Container Name Conflict: If a container name conflict occurs, remove the existing container:
+
+
+docker rm -f <container_id_or_name>
+Connection Errors: Verify that Docker and Docker Compose are correctly installed and configured.
+
+License
+Specify the license for the project here.
+
+
